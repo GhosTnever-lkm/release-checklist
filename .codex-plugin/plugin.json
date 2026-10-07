@@ -1,0 +1,30 @@
+{
+  "name": "release-checklist",
+  "version": "1.0.0",
+  "description": "Prepare a calm, evidence-based release review without publishing anything automatically.",
+  "author": {
+    "name": "GhosTnever"
+  },
+  "homepage": "https://github.com/GhosTnever-lkm/release-checklist",
+  "repository": "https://github.com/GhosTnever-lkm/release-checklist",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "developer-tools",
+    "release-checklist"
+  ],
+  "interface": {
+    "displayName": "Release Checklist",
+    "longDescription": "Prepare a calm, evidence-based release review without publishing anything automatically.",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "developerName": "GhosTnever",
+    "shortDescription": "Prepare a calm, evidence-based release review without publishing anything automatically.",
+    "category": "Developer Tools"
+  },
+  "skills": [
+    "./skills/release-readiness"
+  ]
+}
