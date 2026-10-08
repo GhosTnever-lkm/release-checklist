@@ -1,6 +1,6 @@
 {
   "name": "release-checklist",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Prepare a calm, evidence-based release review without publishing anything automatically.",
   "author": {
     "name": "GhosTnever"
