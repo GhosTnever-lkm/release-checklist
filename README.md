@@ -2,24 +2,34 @@
 
 > Evidence-based release readiness checks and follow-up actions.
 
-Current version: **1.0.1**.
+![CI](https://github.com/GhosTnever-lkm/release-checklist/actions/workflows/ci.yml/badge.svg)
+
+Current version: **1.0.2**.
 
 ## Install in Codex
 
-Add this repository as a plugin marketplace, then install the plugin:
+Add this pinned repository version as a plugin marketplace, then install the plugin:
 
-    codex plugin marketplace add GhosTnever-lkm/release-checklist
+    codex plugin marketplace add GhosTnever-lkm/release-checklist@v1.0.2
     codex plugin add release-checklist --marketplace release-checklist
 
-To inspect the marketplace after adding it, run codex plugin list. Codex may ask you to restart or reload plugins before the skill becomes available.
+To inspect the marketplace after adding it, run `codex plugin marketplace list`. The selected tag keeps the installed marketplace on a known release instead of following future changes on `main`. See the [official Codex marketplace instructions](https://developers.openai.com/plugins/build/plugins) for supported source and ref formats.
 
 ## Use it
 
-Start a Codex task that matches the skill's purpose. The plugin instructions live in skills/ and are included in the marketplace source for inspection.
+Start a Codex task that matches the skill's purpose. The plugin instructions live in `skills/release-readiness/SKILL.md` and are included in the marketplace source for inspection.
 
 ## Scope
 
-This focused Codex plugin has no external service, background process, or credential requirement. See the skill file for its workflow and limits.
+This focused Codex plugin has no external service, background process, or credential requirement. It reviews repository evidence and prepares follow-up actions. It does not publish, tag, deploy, or announce releases automatically.
+
+## Validate this repository
+
+Requires Node.js 20 or newer. The checker and tests use built-in Node.js modules only:
+
+```bash
+npm run ci
+```
 
 ## ☕ Support / Pro Version
 
