@@ -1,0 +1,15 @@
+{
+  "name": "release-checklist",
+  "version": "1.0.2",
+  "private": true,
+  "type": "module",
+  "description": "Codex plugin: release readiness checklist.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "test": "node --test",
+    "ci": "npm run check && npm test"
+  }
+}
