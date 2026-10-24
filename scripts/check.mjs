@@ -2,7 +2,7 @@
 // Repository self-check for GhosTnever-lkm/release-checklist.
 // No external dependencies. Node.js >= 20 (tested on 24).
 
-import { readFile } from 'node:fs/promises';
+import { readFile, realpath } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
@@ -111,6 +111,12 @@ async function checkExists(root, relPath, errors, { required = true } = {}) {
  */
 export async function checkRepository(root = process.cwd()) {
   const absRoot = path.resolve(root);
+  let realRoot = absRoot;
+  try {
+    realRoot = await realpath(absRoot);
+  } catch {
+    // Preserve the existing missing-file diagnostics when the root does not exist.
+  }
   /** @type {Issue[]} */ const errors = [];
   /** @type {Issue[]} */ const warnings = [];
 
@@ -193,6 +199,21 @@ export async function checkRepository(root = process.cwd()) {
         const skillMd = path.join(abs, 'SKILL.md');
         if (!existsSync(skillMd)) {
           errors.push({ code: 'PLUGIN_SKILL_NO_SKILL_MD', message: `skill directory has no SKILL.md: ${skillPath}` });
+          continue;
+        }
+        // Lexical containment above does not detect a symlinked skill directory or file.
+        try {
+          const [realSkill, realSkillMd] = await Promise.all([realpath(abs), realpath(skillMd)]);
+          const isInsideRepository = target => {
+            const relative = path.relative(realRoot, target);
+            return relative === '' || (!path.isAbsolute(relative) && relative !== '..' && !relative.startsWith(`..${path.sep}`));
+          };
+          if (!isInsideRepository(realSkill) || !isInsideRepository(realSkillMd)) {
+            errors.push({ code: 'PLUGIN_SKILL_OUTSIDE_REPOSITORY', message: `plugin.json skill path must stay inside the repository: ${skillPath}` });
+            continue;
+          }
+        } catch (err) {
+          errors.push({ code: 'PLUGIN_SKILL_PATH_RESOLVE', message: `Could not resolve plugin skill path ${skillPath}: ${err?.code ?? err?.message ?? err}` });
           continue;
         }
         let text;
