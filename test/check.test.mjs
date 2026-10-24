@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkRepository } from '../scripts/check.mjs';
@@ -37,5 +39,29 @@ test('rejects a skill file without YAML frontmatter delimiters', async () => {
 test('rejects a skill path that escapes the repository root', async () => {
   const result = await checkRepository(path.join(fixtures, 'outside-skill'));
   assert.equal(result.ok, false);
+  assert.ok(codes(result).includes('PLUGIN_SKILL_OUTSIDE_REPOSITORY'));
+});
+
+test('rejects a skill directory symlink that resolves outside the repository', async t => {
+  const temp = await mkdtemp(path.join(os.tmpdir(), 'release-checklist-symlink-'));
+  t.after(() => rm(temp, { recursive: true, force: true }));
+  const project = path.join(temp, 'project');
+  const outside = path.join(temp, 'external-skill');
+  await cp(path.join(fixtures, 'version-mismatch'), project, { recursive: true });
+  await mkdir(outside, { recursive: true });
+  await writeFile(path.join(outside, 'SKILL.md'), '---\nname: external\ndescription: outside\n---\n');
+  const skillDirectory = path.join(project, 'skills', 'release-readiness');
+  await rm(skillDirectory, { recursive: true, force: true });
+  try {
+    await symlink(outside, skillDirectory, 'junction');
+  } catch (error) {
+    if (process.platform === 'win32' && ['EPERM', 'EACCES'].includes(error.code)) {
+      t.skip(`Creating a directory symlink is not permitted: ${error.code}`);
+      return;
+    }
+    throw error;
+  }
+
+  const result = await checkRepository(project);
   assert.ok(codes(result).includes('PLUGIN_SKILL_OUTSIDE_REPOSITORY'));
 });
