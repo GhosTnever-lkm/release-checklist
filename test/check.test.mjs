@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cp, mkdir, mkdtemp, rm, symlink, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +14,14 @@ test('the current plugin repository passes its self-check', async () => {
   const result = await checkRepository(root);
   assert.equal(result.ok, true, JSON.stringify(result.errors, null, 2));
   assert.deepEqual(result.errors, []);
+});
+
+test('CI actions use immutable commit pins and checkout does not persist credentials', async () => {
+  const workflow = await readFile(path.join(root, '.github/workflows/ci.yml'), 'utf8');
+
+  assert.match(workflow, /uses:\s*actions\/checkout@[a-f0-9]{40}\s+# actions\/checkout v\d/);
+  assert.match(workflow, /persist-credentials:\s*false/);
+  assert.match(workflow, /uses:\s*actions\/setup-node@[a-f0-9]{40}\s+# actions\/setup-node v\d/);
 });
 
 test('reports package, manifest, and README version drift', async () => {
