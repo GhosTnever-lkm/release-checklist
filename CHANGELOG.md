@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Pin CI actions to immutable commits and disable persisted checkout credentials.
+- Add a regression test that guards the workflow's action pin format.
+
 ## 1.0.2 — 2026-10-13
 
 - Add dependency-free repository checks and five regression tests.
